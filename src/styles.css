@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
+
+:root {
+    --principal: #FA58B6;
+    --secundario: #b80abe;
+    --terciario: rgb(165, 12, 179);
+    --cuarto: #1A1A40;
+}
+
+/* Global */
+body {
+    background-color: var(--cuarto);
+}
+
+*{
+    font-family: 'Inconsolata', monospace;
+}
+
+img {
+    max-width: 100%;
+}
+
+
+/* MainContainer */
+.mainContainer {
+    display: flex;
+}
+.right {
+    width: 100%;
+    height: 100vh;
+}
+
+
+/* Side Bar */
+.sideBar {
+    background-color: var(--principal);
+    height: 100vh;
+    width: 5%;
+    display: grid;
+    grid-template-columns: 1;
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.sideBar .sideBarMenuList {
+    align-self: center;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 80%;
+    align-items: center;
+    grid-row: 2;
+}
+.sideBar .sideBarMenuList a {
+    text-decoration: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1.4rem;
+    transition: .3s;
+}
+.sideBar .sideBarMenuList a:hover {
+    color: rgb(240, 240, 240);
+    transition: .3s;
+}
+
+/* Right Side */
+.right .btn-connect {
+    background-color: rgb(255, 192, 203);
+    border-radius: 25px;
+    position: fixed;
+    z-index: 2;
+    right: 5vmin;
+    top: 3vmin;
+}
+
+.right .dashboard {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+.right .dashboard .dashboardBg {
+    background: rgba(255, 192, 203, 0.2);
+    height: 100%;
+    width: 100%;
+    border: 2px solid var(--principal);
+    display: flex;
+    flex-direction: column;
+}
+.right .dashboard .dashboardBg .dashboardHeader {
+    color: white;
+    padding: 2vmin 0;
+}
+.right .dashboard .dashboardBg .dashboardInfo {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    color: white;
+}
+
+.right .dashboard .nft-collection {
+    border: solid black 1px;
+    width: 80%;
+    height: fit-content;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+}
+
+.right .dashboard .nft-collection img {
+    border: solid var(--principal) 2px;
+}
+
+.right .dashboard .nft-collection p {
+    margin: .4rem 0;
+}
+
+.right .dashboard .dashboardBg .dashboardInfo span {
+    color: rgba(255, 255, 255, .6);
+}
+.right .dashboard .dashboardBg .dashboardInfo .info {
+    align-self: center;
+}
+.right .dashboard .dashboardBg .dashboardButtons {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-bottom: 3vmin;
+    width: 60%;
+    margin: 0 auto 3vmin auto;
+}
+.right .dashboard .dashboardBg .dashboardButtons .btn-store-ether {
+    width: auto;
+    border-radius: 10px;
+    padding: 1vmin 2vmin;
+    background-color: var(--principal);
+    color: white;
+}
+.right .dashboard .dashboardBg .dashboardButtons .btn-withdraw-ether {
+    width: auto;
+    border-radius: 10px;
+    padding: 1vmin 2vmin;
+    background-color: var(--principal);
+    color: white;
+}
+
+
+
+.right .storeInfo {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1vmin;
+    color: white;
+}
+.right .dashboard .dashboardBg .storeInfo span {
+    color: rgba(255, 255, 255, .6);
+}
+.right .dashboard .dashboardBg .storeInfo .info {
+    align-self: center;
+}
+.right .storeInfo .input-group {
+    padding-right: 4vmin;
+    display: flex;
+    text-align: center;
+    align-self: center;
+}
+.right .storeInfo .input-group label {
+    color: rgba(255, 255, 255, .6);
+    margin-bottom: 3vmin;
+}
+
+.right .storeInfo .input-group input {
+    border-color: transparent;
+    border-radius: 25px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.contact-form .form-field {
+    position: relative;
+    margin: 32px 0;
+}
+.contact-form .input-text {
+    display: block;
+    width: 100%;
+    height: 36px;
+    font-family: Lusitana, serif;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 400;
+    border: none;
+    border-radius: 25px;
+    background-color: transparent;
+    border: 2px solid var(--principal);
+    color: white;
+}
+.contact-form .input-text:focus {
+    outline: none;
+}
+       
+
+.contact-form .label {
+    position: relative;
+    font-family: Lusitana, serif;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 400;
+    color: #888;
+    cursor: text;
+    transition: transform .2s ease-in-out;
+}
+    
+.contact-form .submit-btn {
+    display: inline-block;
+    background-color: #000;
+    color: #fff;
+    font-family: Raleway, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    width: auto;
+    border-radius: 25px;
+}
+
+.erc { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.erc input {
+    max-width: 80%;
+    border-radius: 25px !important;
+}
