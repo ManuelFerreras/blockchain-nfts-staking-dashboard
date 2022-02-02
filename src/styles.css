@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
 
 :root {
-    --principal: #FA58B6;
+    --principal: #f20089;
     --secundario: #b80abe;
-    --terciario: rgb(165, 12, 179);
+    --terciario: #bc00dd;
     --cuarto: #1A1A40;
 }
 
 /* Global */
 body {
-    background-color: var(--cuarto);
+    background-color: var(--terciario);
 }
 
 *{
@@ -70,7 +70,7 @@ img {
 
 /* Right Side */
 .right .btn-connect {
-    background-color: rgb(255, 192, 203);
+    background-color: var(--principal);
     border-radius: 25px;
     position: fixed;
     z-index: 2;
@@ -84,7 +84,6 @@ img {
     display: flex;
 }
 .right .dashboard .dashboardBg {
-    background: rgba(255, 192, 203, 0.2);
     height: 100%;
     width: 100%;
     border: 2px solid var(--principal);
@@ -118,6 +117,7 @@ img {
 
 .right .dashboard .nft-collection p {
     margin: .4rem 0;
+    font-size: 1.6vmin;
 }
 
 .right .dashboard .dashboardBg .dashboardInfo span {

@@ -1,87 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract PiggyBank {
+contract nftStaking is Ownable {
+    using SafeMath for uint;
 
-    mapping (address => uint256) balances;
-    mapping (address => mapping(address => uint)) ercBalances;
-    mapping (address => address[]) ercTokensOf;
-
-    event ERC20Desposit(address, address, uint);
-    event ERC20Withdrawal(address, address, uint);
-    event EtherWithdrawn(address, uint);
-    event EtherDeposit(address, uint);
-
-    function getBalanceOf(address _owner) public view returns(uint256) {
-        return balances[_owner];
+    // Variables & Structs.
+    struct NftCollection {
+        address collectionAddress;
+        address rewardsTokenAddress;
+        string collectionName;
+        string rewardsTokenName;
+        uint amountOfTokens;
+        uint amountOfTokensGeneratedPerNftPerDay;
+        bool ended;
     }
 
-    function withdrawEther(uint256 _amount) public {
-        require(balances[msg.sender] >= _amount, "Not Enough Balance to Withdraw");
+    mapping(address => NftCollection) nftCollections;
+    mapping(address => bool) activeCollections;
 
-        // First decrease sender balance to avoid reentrancy attack.
-        balances[msg.sender] -= _amount;
-        payable(msg.sender).transfer(_amount);
+    mapping(address => mapping(uint => uint)) lastClaimOfNfts;
 
-        emit EtherWithdrawn(msg.sender, _amount);
-    }
+
+    // Events.
+    event newNftCollection(address);
+
+    
+    constructor() {}
+
 
     receive() external payable {
-        balances[msg.sender] += msg.value;
-        emit EtherDeposit(msg.sender, msg.value);
+        revert(); // Do not accept ETH.
     }
 
-    function getErcBalanceOf(address _token, address _owner) public view returns (uint256) {
-        return ercBalances[_token][_owner];
+
+    // Functions.
+    function addNewNftCollection( address _newCollectionAddress, string memory _newCollectionName, address _rewardsTokenAddress, string memory _rewardsTokenName, uint _amountOfTokens, uint _amountOfTokensGeneratedPerDay) public onlyOwner {
+        require(_newCollectionAddress != address(0) && _rewardsTokenAddress != address(0), "The collection and the Rewards Token Address can not be to the 0 address");
+        require(keccak256(abi.encodePacked(_newCollectionName)) != keccak256(abi.encodePacked("")) && keccak256(abi.encodePacked(_rewardsTokenName)) != keccak256(abi.encodePacked("")), "Collection and Rewards Token Name can not be empty.");
+        require(_amountOfTokens > 0, "The amount of Rewards tokens must be > 0.");
+        require(_amountOfTokens % _amountOfTokensGeneratedPerDay == 0, "_amountOfTokens must be a multiple of _amountOfTokensGeneratedPerDay.");
+
+        ERC20(_rewardsTokenAddress).transferFrom(msg.sender, address(this), _amountOfTokens);
+        nftCollections[_newCollectionAddress] = NftCollection( _newCollectionAddress, _rewardsTokenAddress, _newCollectionName, _rewardsTokenName, _amountOfTokens, _amountOfTokensGeneratedPerDay, false);
+
+        activeCollections[_newCollectionAddress] = true;
+        emit newNftCollection(_newCollectionAddress);
     }
 
-    function getERCTokensOf(address _owner) public view returns(address[] memory) {
-        return ercTokensOf[_owner];
-    }
+    function claimableTokens( address _collectionAddress ) public view onlyActiveCollections(_collectionAddress) returns(uint) {
+        uint _ownedNfts = ERC721(_collectionAddress).balanceOf(msg.sender);
+        uint _claimableTokens = 0;
+        uint _lastClaim = 0;
 
-    // Returns true if this user has ever deposited the specified ERC20.
-    function checkIfOwned(address _token) public view returns(bool) {
-        bool _result = false;
-
-        for(uint i = 0; i < ercTokensOf[msg.sender].length; i++) {
-            if(ercTokensOf[msg.sender][i] == _token) {
-                _result = true;
+        for (uint i = 0; i<_ownedNfts; i++) {
+            _lastClaim = lastClaimOfNfts[_collectionAddress][ERC721Enumerable(_collectionAddress).tokenOfOwnerByIndex(msg.sender, i)];
+            if(_lastClaim != 0 && _lastClaim % timeStampToDays(block.timestamp) > 0) {
+                _claimableTokens += (_lastClaim - timeStampToDays(block.timestamp)).div(1 days).mul(nftCollections[_collectionAddress].amountOfTokensGeneratedPerNftPerDay);
             }
         }
-
-        return _result;
+        
+        return _claimableTokens;
+        
     }
 
-    function depositErcToken(address _token, uint256 amount) public {
-        ERC20 token_ = ERC20(_token);
 
-        require(token_.balanceOf(msg.sender) > amount, "Not enough ERC20 Balance.");
-        require(token_.allowance(msg.sender, address(this)) < amount, "Approve the contract from your token first.");
-
-        token_.transferFrom(msg.sender, address(this), amount);
-
-        ercBalances[_token][msg.sender] += amount;
-
-        if(!checkIfOwned(_token)) {
-            ercTokensOf[msg.sender].push(_token);
-        }
-
-        emit ERC20Desposit(_token, msg.sender, amount);
+    function timeStampToDays(uint _timestamp) public pure returns(uint) {
+        return((_timestamp - _timestamp % 1 days).div(1 days));
     }
 
-    function withdrawErcToken(address _token, uint256 amount) public {
-        ERC20 token_ = ERC20(_token);
+    // Modifiers.
+    modifier onlyActiveCollections( address _collectionAddress ) {
+        require(activeCollections[_collectionAddress], "Collection is not Active.");
 
-        require(ercBalances[_token][msg.sender] > amount, "You don't have enough balance in piggy.");
-
-        // We first update the balance to avoid reentrancy attacks.
-        ercBalances[_token][msg.sender] -= amount;
-
-        token_.transfer(msg.sender, amount);
-
-        emit ERC20Withdrawal(_token, msg.sender, amount);
+        _;
     }
 
 }
