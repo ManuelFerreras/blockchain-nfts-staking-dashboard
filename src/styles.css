@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
 
 :root {
-    --principal: #f20089;
-    --secundario: #b80abe;
-    --terciario: #bc00dd;
-    --cuarto: #1A1A40;
+    --principal: rgb(216, 81, 216);
+    --terciario: rgb(69, 59, 91);
 }
 
 /* Global */
@@ -27,7 +25,8 @@ img {
 }
 .right {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    margin-left: 5%;
 }
 
 
@@ -39,6 +38,7 @@ img {
     display: grid;
     grid-template-columns: 1;
     grid-template-rows: repeat(3, 1fr);
+    position: fixed;
 }
 
 .sideBar .sideBarMenuList {
@@ -100,6 +100,23 @@ img {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     color: white;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .right .dashboard .dashboardBg .dashboardInfo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .right .dashboard .dashboardBg .dashboardInfo {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .right .dashboard .dashboardBg .dashboardInfo .nft-collection p {
+        font-size: 2.5vmin;
+    }
 }
 
 .right .dashboard .nft-collection {
@@ -118,6 +135,9 @@ img {
 .right .dashboard .nft-collection p {
     margin: .4rem 0;
     font-size: 1.6vmin;
+}
+.right .dashboard .nft-collection .btn {
+    max-width: 80%;
 }
 
 .right .dashboard .dashboardBg .dashboardInfo span {
@@ -147,6 +167,16 @@ img {
     padding: 1vmin 2vmin;
     background-color: var(--principal);
     color: white;
+}
+
+.right .dashboardBg .connect-text {
+    color: white;
+    margin: auto 0;
+}
+.right .dashboardBg .collections-text {
+    color: white;
+    margin: auto 0;
+    grid-column: 2;
 }
 
 

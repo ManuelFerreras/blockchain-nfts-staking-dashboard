@@ -1,10 +1,11 @@
 import React from 'react';
 
-import nft1 from "./656.png";
-import nft2 from "./11.png";
-import nft3 from "./355.png";
+import { ethers } from 'ethers';
 
-export default ({ login, connected, setConnected, accountBalance, contractBalance, accountStoredBalance, openWithdrawMenu, openStoreMenu }) => {
+// Components
+import Collection from "./Collection";
+
+export default ({ contract, collections, connected, ERC20Tokens, ERC721Tokens, claimableTokens, claimCollection }) => {
 
     return (
 
@@ -13,36 +14,31 @@ export default ({ login, connected, setConnected, accountBalance, contractBalanc
             
             
             <div className='dashboardBg'>
-                <h2 className='text-center dashboardHeader'>Dashboard</h2>
+                { connected ? (
+                    <>
+                        <h2 className='text-center dashboardHeader'>Dashboard</h2>
 
-                <div className='dashboardInfo'>
-                    <div className='nft-collection'>
-                        <img src={ nft1 } />
-                        <p>Collection: NFT Project Name 1</p>
-                        <p>Nfts Balance: 0</p>
-                        <p>Token Balance: 0</p>
-                        <p>Daily Income: 0</p>
-                    </div>
+                        <div className='dashboardInfo'>
 
-                    <div className='nft-collection'>
-                        <img src={ nft2 } />
-                        <p>Collection: NFT Project Name 2</p>
-                        <p>Nfts Balance: 0</p>
-                        <p>Token Balance: 0</p>
-                        <p>Daily Income: 0</p>
-                    </div>
+                            {(collections != undefined && ERC20Tokens != undefined && ERC721Tokens != undefined && claimableTokens != undefined && claimableTokens.length > 0 && collections.length > 0 && ERC721Tokens.length > 0 && ERC20Tokens.length > 0) ? collections.map((elem, i) => {
+                                return(
+                                    <Collection key={i} nftImage={elem[1]} contract={contract} collectionName={elem[0]} collectionId={elem[6]} claimableTokens={ethers.utils.formatUnits(claimableTokens[i], 18)} claimCollection={claimCollection} nftsBalance={ethers.utils.formatUnits(ERC721Tokens[i], 0)} tokenBalance={ethers.utils.formatUnits(ERC20Tokens[i], 18)} dailyIncome={ethers.utils.formatUnits(elem[5], 18)} />
+                                )}) : (
+                                <>
+                                    <h2 className='text-center collections-text '>No Collections to Show</h2>
+                                </>
+                            )}
 
-                    <div className='nft-collection'>
-                        <img src={ nft3 } />
-                        <p>Collection: NFT Project Name 3</p>
-                        <p>Nfts Balance: 0</p>
-                        <p>Token Balance: 0</p>
-                        <p>Daily Income: 0</p>
-                    </div>
-                    
-                </div>
-
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className='text-center connect-text'>Connect with Wallet</h2>
+                    </>
+                ) }
+                
             </div>
+            
         </div>
 
     );
