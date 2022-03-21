@@ -16,6 +16,7 @@ contract stakingDApp {
         uint nftClaims;
         uint rewardedTokensPerClaim;
         uint collectionId;
+        uint creationTime;
     }
 
     Collection[] collections;
@@ -41,7 +42,7 @@ contract stakingDApp {
         uint _rewardedTokensPerClaim
 
     ) public onlyOwner {
-        collections.push(Collection(_collectionName, _collectionPreviewImageUrl, _collectionAddress, _collectionRewardsTokenAddress, _nftClaims, _rewardedTokensPerClaim * 10 ** ERC20(_collectionRewardsTokenAddress).decimals(), collections.length));
+        collections.push(Collection(_collectionName, _collectionPreviewImageUrl, _collectionAddress, _collectionRewardsTokenAddress, _nftClaims, _rewardedTokensPerClaim * 10 ** ERC20(_collectionRewardsTokenAddress).decimals(), collections.length, block.timestamp));
 
         emit newCollection(collections[collections.length - 1]);
     }
@@ -53,7 +54,7 @@ contract stakingDApp {
         address _collectionRewardsTokenAddress,
         uint _collectionId
     ) public onlyOwner {
-        collections[_collectionId] = Collection(_collectionName, _collectionPreviewImageUrl, _collectionAddress, _collectionRewardsTokenAddress, collections[_collectionId].nftClaims, collections[_collectionId].rewardedTokensPerClaim, _collectionId);
+        collections[_collectionId] = Collection(_collectionName, _collectionPreviewImageUrl, _collectionAddress, _collectionRewardsTokenAddress, collections[_collectionId].nftClaims, collections[_collectionId].rewardedTokensPerClaim, _collectionId, collections[_collectionId].creationTime);
 
         emit collectionChanged(_collectionId);
     }
@@ -80,12 +81,13 @@ contract stakingDApp {
         for(uint i = 0; i < ERC721Enumerable(collections[_collectionId].collectionAddress).balanceOf(msg.sender); i++) {
             _nftId = ERC721Enumerable(collections[_collectionId].collectionAddress).tokenOfOwnerByIndex(msg.sender, i);
             if(checkDaysClaimedByNft(_collectionId, _nftId)) {
-                require(_token.balanceOf(address(this)) >= (withdrawn + collections[_collectionId].rewardedTokensPerClaim), "Not enough tokens in contract reserve.");
+                uint widthdrawableDays = claimedDaysPerNft[_collectionId][_nftId] == 0 ? (block.timestamp - collections[_collectionId].creationTime - ((block.timestamp - collections[_collectionId].creationTime) % 1 days)) / 1 days : (block.timestamp - lastClaimTimePerNft[_collectionId][_nftId] - ((block.timestamp - lastClaimTimePerNft[_collectionId][_nftId]) % 1 days)) / 1 days;
+                require(_token.balanceOf(address(this)) >= (withdrawn + collections[_collectionId].rewardedTokensPerClaim * widthdrawableDays), "Not enough tokens in contract reserve.");
 
                 claimedDaysPerNft[_collectionId][_nftId] += 1;
                 lastClaimTimePerNft[_collectionId][_nftId] = block.timestamp;
 
-                withdrawn += collections[_collectionId].rewardedTokensPerClaim;
+                withdrawn += collections[_collectionId].rewardedTokensPerClaim * widthdrawableDays;
             }
         }
 
@@ -102,7 +104,8 @@ contract stakingDApp {
         for(uint i = 0; i < ERC721Enumerable(collections[_collectionId].collectionAddress).balanceOf(msg.sender); i++) {
             _nftId = ERC721Enumerable(collections[_collectionId].collectionAddress).tokenOfOwnerByIndex(msg.sender, i);
             if(checkDaysClaimedByNft(_collectionId, _nftId)) {
-                withdrawable += collections[_collectionId].rewardedTokensPerClaim;
+                uint widthdrawableDays = claimedDaysPerNft[_collectionId][_nftId] == 0 ? (block.timestamp - collections[_collectionId].creationTime - ((block.timestamp - collections[_collectionId].creationTime) % 1 days)) / 1 days : (block.timestamp - lastClaimTimePerNft[_collectionId][_nftId] - ((block.timestamp - lastClaimTimePerNft[_collectionId][_nftId]) % 1 days)) / 1 days;
+                withdrawable += collections[_collectionId].rewardedTokensPerClaim * widthdrawableDays;
             }
         }
 
